@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>常用中藥練習</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="theme-color" content="#426b57">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="中藥練習">
+<style>
+/* Layout: single column, tab bar on top switches 字卡 / 四選一 views sharing one dataset */
+:root{
+ --ink:#26352e;--muted:#6c7b73;--paper:#f8f9f5;--surface:#ffffff;--surface2:#f3f7f2;
+ --green:#426b57;--green-ink:#ffffff;--mint:#edf4ee;--line:#e2e8e0;--track:#e9eee8;--bar:#6e9678;
+ --good-bg:#eff7f0;--good-fg:#315b3c;--good-line:#6e9b79;--bad-bg:#fff3f1;--bad-fg:#8c3935;--bad-line:#c97870;
+ --shadow:0 10px 30px rgba(49,75,56,.07);
+ --sans:system-ui,-apple-system,"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+ --latin:Georgia,"Times New Roman",serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+ --ink:#e3ebe5;--muted:#9aaba1;--paper:#141a17;--surface:#1c2420;--surface2:#212c26;
+ --green:#7fb193;--green-ink:#10251a;--mint:#25362d;--line:#2f3d35;--track:#2a3630;--bar:#7fb193;
+ --good-bg:#1f3427;--good-fg:#a9d8b5;--good-line:#5f9a70;--bad-bg:#3a2221;--bad-fg:#f0b0a9;--bad-line:#b8645c;
+ --shadow:0 10px 30px rgba(0,0,0,.3);color-scheme:dark}}
+:root[data-theme="dark"]{
+ --ink:#e3ebe5;--muted:#9aaba1;--paper:#141a17;--surface:#1c2420;--surface2:#212c26;
+ --green:#7fb193;--green-ink:#10251a;--mint:#25362d;--line:#2f3d35;--track:#2a3630;--bar:#7fb193;
+ --good-bg:#1f3427;--good-fg:#a9d8b5;--good-line:#5f9a70;--bad-bg:#3a2221;--bad-fg:#f0b0a9;--bad-line:#b8645c;
+ --shadow:0 10px 30px rgba(0,0,0,.3);color-scheme:dark}
+[hidden]{display:none!important}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px}
+.wrap{max-width:880px;margin:auto;padding-block:26px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+h1{font-size:clamp(25px,4vw,34px);margin:0 0 5px;text-wrap:balance}
+h2,h3{text-wrap:balance}
+.sub{font-size:14px;color:var(--muted);line-height:1.6}
+.tag{background:var(--mint);color:var(--green);padding:7px 12px;border-radius:99px;font-size:13px;font-weight:700}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--mint);padding:5px;border-radius:15px;margin-bottom:20px}
+.tabs button{border:0;background:transparent;color:var(--green);padding:11px;border-radius:11px}
+.tabs button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:var(--shadow)}
+label{font-size:13px;color:var(--muted);display:block;margin-bottom:6px}
+select,input{width:100%;font-size:16px;padding:12px;border:1px solid var(--line);border-radius:11px;background:var(--surface);color:var(--ink);font-family:inherit}
+input:focus-visible,select:focus-visible,button:focus-visible,.flashcard:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+button{font:inherit;border:1px solid var(--line);border-radius:12px;padding:12px 16px;background:var(--surface);color:var(--ink);font-weight:700;cursor:pointer;touch-action:manipulation;min-height:44px}
+button.primary{background:var(--green);color:var(--green-ink);border-color:var(--green)}
+button:disabled{opacity:.45;cursor:not-allowed}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.actions button{flex:1}
+.topline{display:flex;justify-content:space-between;gap:10px;color:var(--muted);font-size:13px;margin:8px 2px 9px;font-variant-numeric:tabular-nums}
+.track{height:8px;background:var(--track);border-radius:20px;overflow:hidden;margin-bottom:18px}.bar{height:100%;background:var(--bar);width:0;transition:width .2s}
+.meta{font-size:12px;color:var(--muted);margin-top:7px}
+
+/* 字卡 */
+.card-area{perspective:1200px;margin:4px 0 16px}
+.flashcard{width:100%;min-height:300px;position:relative;transform-style:preserve-3d;transition:transform .45s;cursor:pointer;border-radius:24px;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.flashcard.flipped{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border:1px solid var(--line);border-radius:24px;background:var(--surface);box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:28px;overflow:auto}
+.back{transform:rotateY(180deg);background:var(--surface2)}
+.kicker{font-size:13px;color:var(--muted);margin-bottom:18px;letter-spacing:.05em}
+.term{font-size:clamp(36px,8vw,58px);font-weight:750;letter-spacing:2px;line-height:1.25}
+.latin{font-family:var(--latin);font-size:clamp(19px,4vw,27px);line-height:1.5;overflow-wrap:anywhere}
+.face .term.latin{font-weight:500;letter-spacing:0}
+.category{margin-top:18px;color:var(--green);font-size:14px}
+.hint{font-size:13px;color:var(--muted);margin-top:22px}
+.controls{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;margin:6px 0 12px}
+.controls button{min-width:100px}
+.extra{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.extra button{font-weight:600;font-size:14px}
+.notice{background:var(--mint);color:var(--green);border-radius:12px;padding:10px 14px;font-size:14px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.notice button{padding:6px 12px;font-size:13px}
+
+/* 四選一 */
+.settings{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.qtype{font-size:13px;color:var(--green);font-weight:700;margin-bottom:12px}
+.question{font-size:clamp(22px,4.5vw,30px);font-weight:750;line-height:1.45;overflow-wrap:anywhere;margin:8px 0 20px}
+.question .latin{font-weight:500}
+.question small{display:block;font-size:13px;font-weight:500;color:var(--muted);margin-top:9px;font-family:var(--sans)}
+.options{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.option{text-align:left;min-height:66px;display:flex;align-items:center;gap:10px;line-height:1.45;min-width:0;overflow-wrap:anywhere}
+.option:disabled{opacity:1;cursor:default}
+.letter{width:29px;height:29px;border-radius:50%;background:var(--mint);color:var(--green);display:inline-grid;place-items:center;flex:0 0 29px;font-size:13px}
+.option.correct{border-color:var(--good-line);background:var(--good-bg)}.option.correct .letter{background:var(--good-line);color:var(--surface)}
+.option.wrong{border-color:var(--bad-line);background:var(--bad-bg)}.option.wrong .letter{background:var(--bad-line);color:var(--surface)}
+.feedback{margin-top:15px;padding:14px;border-radius:13px;font-size:14px;line-height:1.65}
+.feedback.good{background:var(--good-bg);color:var(--good-fg)}.feedback.bad{background:var(--bad-bg);color:var(--bad-fg)}
+.bottom{display:flex;justify-content:space-between;gap:10px;margin-top:16px;align-items:center;flex-wrap:wrap}
+.confirmbar{margin-top:14px;padding:14px;border-radius:13px;background:var(--bad-bg);color:var(--bad-fg);font-size:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.confirmbar span{flex:1 1 200px}
+.confirmbar button{padding:8px 14px}
+.scoregrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:17px 0}
+.stat{background:var(--mint);border-radius:14px;padding:15px;text-align:center}.stat strong{display:block;font-size:25px;color:var(--green);font-variant-numeric:tabular-nums}.stat span{font-size:12px;color:var(--muted)}
+.reviewitem{border-top:1px solid var(--line);padding:13px 0;font-size:14px;line-height:1.6}.reviewitem b{color:var(--bad-fg)}
+.foot{text-align:center;margin-top:22px}
+.touch-only{display:none}
+@media (hover:none) and (pointer:coarse){.touch-only{display:inline}.desk-only{display:none}button:hover{filter:none}}
+.flashcard.swipe-l{animation:nudgeL .22s ease}.flashcard.swipe-r{animation:nudgeR .22s ease}
+@keyframes nudgeL{0%{translate:0}50%{translate:-14px}100%{translate:0}}
+@keyframes nudgeR{0%{translate:0}50%{translate:14px}100%{translate:0}}
+@media(max-width:560px){
+ .wrap{padding-block:16px 32px}
+ header{margin-bottom:14px}header .sub{font-size:13px}
+ .tag{padding:5px 10px;font-size:12px}
+ .settings,.options,.row2{grid-template-columns:1fr}
+ .settings{gap:10px}
+ .panel{padding:16px;border-radius:18px}
+ .flashcard{min-height:min(300px,48vh)}.face{padding:20px}
+ .controls{display:grid;grid-template-columns:1fr 1.2fr 1fr;gap:8px}
+ .controls button{min-width:0;padding:14px 8px}
+ .extra{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+ .extra button{padding:12px 8px}
+ .bottom button{flex:1}
+ .question{margin:4px 0 16px}
+ .option{min-height:56px;padding:12px}
+ .scoregrid{gap:8px}.stat{padding:12px 6px}.stat strong{font-size:22px}
+ .actions button{flex:1 1 100%}
+ .confirmbar button{flex:1}
+}
+@media(min-width:900px){.wrap{max-width:960px}.flashcard{min-height:340px}}
+@media (prefers-reduced-motion: reduce){.flashcard,.bar{transition:none}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<header>
+ <div><h1>常用中藥練習</h1><div class="sub">根據《常用中藥目錄》製作｜字卡複習與四選一測驗</div></div>
+ <div class="tag" id="totalTag">162 個中藥項目</div>
+</header>
+
+<div class="tabs" role="tablist">
+ <button role="tab" id="tab-cards" aria-selected="true" aria-controls="view-cards">字卡複習</button>
+ <button role="tab" id="tab-quiz" aria-selected="false" aria-controls="view-quiz">四選一練習</button>
+</div>
+
+<!-- ================= 字卡 ================= -->
+<section id="view-cards" role="tabpanel" aria-labelledby="tab-cards">
+ <div id="wrongNotice" class="notice" hidden><span id="wrongNoticeText">正在複習錯題字卡</span><button id="clearWrong">顯示全部字卡</button></div>
+ <div class="row2">
+  <input id="search" type="search" placeholder="搜尋中藥名稱或拉丁學名…" aria-label="搜尋">
+  <select id="cardChapter" aria-label="章節"><option value="">全部章節</option></select>
+ </div>
+ <div class="topline" style="margin-top:16px"><span id="counter">第 1 / 162 張</span><span id="seenText">0% 已瀏覽</span></div>
+ <div class="track"><div class="bar" id="cardBar"></div></div>
+ <div class="card-area">
+  <div class="flashcard" id="flashcard" role="button" tabindex="0" aria-label="點擊翻面">
+   <div class="face front"><div class="kicker" id="frontKicker">中藥名稱</div><div class="term" id="frontText"></div><div class="category" id="frontCategory"></div><div class="hint"><span class="desk-only">點擊卡片翻面（空白鍵）</span><span class="touch-only">點一下翻面，左右滑動換卡</span></div></div>
+   <div class="face back"><div class="kicker" id="backKicker">拉丁學名</div><div class="latin" id="backText"></div><div class="category" id="backCategory"></div><div class="hint">點擊卡片返回</div></div>
+  </div>
+ </div>
+ <div class="controls">
+  <button id="prev">← 上一張</button><button class="primary" id="flip">翻面</button><button id="nextCard">下一張 →</button>
+ </div>
+ <div class="extra">
+  <button id="shuffle">隨機排序</button><button id="reverse">切換正反面</button><button id="resetCards">重新開始</button><button id="quizThese">用這些字卡出題</button>
+ </div>
+ <div class="sub foot"><span class="desk-only">鍵盤：← → 換卡，空白鍵翻面。</span><span class="touch-only">左右滑動卡片可以換卡。</span>字卡只呈現目錄中的中藥名稱、拉丁學名與分類。</div>
+</section>
+
+<!-- ================= 四選一 ================= -->
+<section id="view-quiz" role="tabpanel" aria-labelledby="tab-quiz" hidden>
+ <div id="setup" class="panel">
+  <h2 style="margin:0 0 5px">開始練習</h2>
+  <div class="sub" id="setupSub">先選擇出題範圍與題數，系統會從目錄中隨機抽題。</div>
+  <div class="settings">
+   <div><label for="chapter">章節範圍</label><select id="chapter"><option value="">全部章節</option></select></div>
+   <div><label for="mode">考題方向</label><select id="mode"><option value="mix">混合（中文／拉丁學名）</option><option value="cn">看中文，選拉丁學名</option><option value="latin">看拉丁學名，選中文</option></select></div>
+   <div><label for="count">練習題數</label><select id="count"><option value="10">10 題</option><option value="20" selected>20 題</option><option value="30">30 題</option><option value="50">50 題</option><option value="all">全部題目</option></select></div>
+   <div><label for="order">出題順序</label><select id="order"><option value="random">隨機出題</option><option value="sequence">依目錄順序</option></select></div>
+  </div>
+  <div class="actions"><button class="primary" id="start">開始作答</button></div>
+ </div>
+
+ <div id="quiz" hidden>
+  <div class="topline"><span id="progress">第 1 / 20 題</span><span id="liveScore">答對 0 題</span></div>
+  <div class="track"><div class="bar" id="quizBar"></div></div>
+  <div class="panel">
+   <div class="qtype" id="qtype">請選出正確答案</div>
+   <div class="question" id="question"></div>
+   <div class="options" id="options"></div>
+   <div id="feedback" hidden></div>
+   <div id="confirmQuit" class="confirmbar" hidden><span>確定要結束本次練習嗎？目前作答結果不會保留。</span><button id="quitYes">結束</button><button id="quitNo">繼續作答</button></div>
+   <div class="bottom"><button id="quit">結束本次練習</button><button id="next" class="primary" disabled>下一題 →</button></div>
+  </div>
+ </div>
+
+ <div id="result" class="panel" hidden>
+  <h2 style="margin:0">練習完成！</h2>
+  <div class="sub">這是本次練習的作答結果。</div>
+  <div class="scoregrid">
+   <div class="stat"><strong id="finalScore">0</strong><span>答對題數</span></div>
+   <div class="stat"><strong id="finalRate">0%</strong><span>答對率</span></div>
+   <div class="stat"><strong id="finalWrong">0</strong><span>答錯題數</span></div>
+  </div>
+  <div id="resultMessage" style="font-weight:700;margin:8px 0 4px"></div>
+  <div class="actions"><button class="primary" id="retry">重新練習</button><button id="wrongOnly">只練錯題</button><button id="wrongCards">用字卡複習錯題</button></div>
+  <h3 style="margin:22px 0 5px">作答檢討</h3>
+  <div id="review"></div>
+ </div>
+ <div class="sub foot">本練習只考核中藥名稱、拉丁學名與章節分類，不代表藥物使用或處方建議。</div>
+</section>
+</div>
+
+<script>
+const allCards = [{"chapter": "第一章 補虛藥", "section": "第一節 補氣藥", "name": "人參", "latin": "Ginseng Radix et Rhizoma"}, {"chapter": "第一章 補虛藥", "section": "第一節 補氣藥", "name": "西洋參", "latin": "Panacis Quinquefolii Radix"}, {"chapter": "第一章 補虛藥", "section": "第一節 補氣藥", "name": "黨參", "latin": "Codonopsis Radix"}, {"chapter": "第一章 補虛藥", "section": "第一節 補氣藥", "name": "黃耆", "latin": "Astragali Radix"}, {"chapter": "第一章 補虛藥", "section": "第一節 補氣藥", "name": "山藥", "latin": "Dioscoreae Rhizoma"}, {"chapter": "第一章 補虛藥", "section": "第一節 補氣藥", "name": "白扁豆", "latin": "Lablab Album Semen"}, {"chapter": "第一章 補虛藥", "section": "第一節 補氣藥", "name": "大棗", "latin": "Jujubae Fructus"}, {"chapter": "第一章 補虛藥", "section": "第一節 補氣藥", "name": "甘草", "latin": "Glycyrrhizae Radix et Rhizoma"}, {"chapter": "第一章 補虛藥", "section": "第二節 補血藥", "name": "當歸", "latin": "Angelicae Sinensis Radix"}, {"chapter": "第一章 補虛藥", "section": "第二節 補血藥", "name": "地黃", "latin": "Rehmanniae Radix"}, {"chapter": "第一章 補虛藥", "section": "第二節 補血藥", "name": "白芍", "latin": "Paeoniae Alba Radix PAEONIAE RADIX ALBA"}, {"chapter": "第一章 補虛藥", "section": "第二節 補血藥", "name": "何首烏", "latin": "Polygoni Multiflori Radix PLEUROPTERII MULTIFLORII RADIX"}, {"chapter": "第一章 補虛藥", "section": "第二節 補血藥", "name": "阿膠", "latin": "Asini Corii Colla"}, {"chapter": "第一章 補虛藥", "section": "第三節 補陰藥", "name": "枸杞子", "latin": "Lycii Fructus"}, {"chapter": "第一章 補虛藥", "section": "第三節 補陰藥", "name": "麥門冬", "latin": "Ophiopogonis Radix"}, {"chapter": "第一章 補虛藥", "section": "第三節 補陰藥", "name": "天門冬", "latin": "Asparagi Radix"}, {"chapter": "第一章 補虛藥", "section": "第三節 補陰藥", "name": "知母", "latin": "Anemarrhenae Rhizoma"}, {"chapter": "第一章 補虛藥", "section": "第三節 補陰藥", "name": "石斛", "latin": "Dendrobii Caulis"}, {"chapter": "第一章 補虛藥", "section": "第三節 補陰藥", "name": "女貞子", "latin": "Ligustri Lucidi Fructus"}, {"chapter": "第一章 補虛藥", "section": "第三節 補陰藥", "name": "黃精", "latin": "Polygonati Rhizoma"}, {"chapter": "第一章 補虛藥", "section": "第三節 補陰藥", "name": "百合", "latin": "Lilii Bulbus"}, {"chapter": "第一章 補虛藥", "section": "第三節 補陰藥", "name": "龜板", "latin": "Testudinis Carapax"}, {"chapter": "第一章 補虛藥", "section": "第三節 補陰藥", "name": "楮實子", "latin": "Broussonetiae Fructus"}, {"chapter": "第一章 補虛藥", "section": "第四節 補陽藥", "name": "巴戟天", "latin": "Morindae Officinalis Radix GYNOCHTHODISI RADIX"}, {"chapter": "第一章 補虛藥", "section": "第四節 補陽藥", "name": "肉蓯蓉", "latin": "Cistanches Herba"}, {"chapter": "第一章 補虛藥", "section": "第四節 補陽藥", "name": "淫羊藿", "latin": "Epimedii Herba"}, {"chapter": "第一章 補虛藥", "section": "第四節 補陽藥", "name": "沙苑子", "latin": "Astragali Complanati Semen PHYLLOLOBII SEMEN"}, {"chapter": "第一章 補虛藥", "section": "第四節 補陽藥", "name": "杜仲", "latin": "Eucommiae Cortex"}, {"chapter": "第一章 補虛藥", "section": "第四節 補陽藥", "name": "鎖陽", "latin": "Cynomorri Herba"}, {"chapter": "第一章 補虛藥", "section": "第四節 補陽藥", "name": "續斷", "latin": "Dipsaci Radix"}, {"chapter": "第一章 補虛藥", "section": "第四節 補陽藥", "name": "補骨脂", "latin": "Psoraleae Fructus"}, {"chapter": "第一章 補虛藥", "section": "第四節 補陽藥", "name": "菟絲子", "latin": "Cuscutae Semen"}, {"chapter": "第一章 補虛藥", "section": "第四節 補陽藥", "name": "冬蟲夏草", "latin": "Cordyceps"}, {"chapter": "第一章 補虛藥", "section": "第四節 補陽藥", "name": "鹿茸", "latin": "Cervi Cornu Pantotrichum"}, {"chapter": "第二章 溫裏藥", "section": "", "name": "附子", "latin": "Aconiti Lateralis Radix"}, {"chapter": "第二章 溫裏藥", "section": "", "name": "肉桂", "latin": "Cinnamomi Cortex"}, {"chapter": "第二章 溫裏藥", "section": "", "name": "吳茱萸", "latin": "Euodiae Fructus TETRADII RUTICARPI FRUCTUS"}, {"chapter": "第二章 溫裏藥", "section": "", "name": "小茴香", "latin": "Foeniculi Fructus"}, {"chapter": "第二章 溫裏藥", "section": "", "name": "細辛", "latin": "Asari Radix"}, {"chapter": "第二章 溫裏藥", "section": "", "name": "丁香", "latin": "Caryophylli Flos"}, {"chapter": "第二章 溫裏藥", "section": "", "name": "高良薑", "latin": "Alpiniae Officinarum Rhizoma"}, {"chapter": "第二章 溫裏藥", "section": "", "name": "炮薑", "latin": "Zingiberis Rhizoma Praeparatum"}, {"chapter": "第三章 理氣藥", "section": "", "name": "烏藥", "latin": "Linderae Radix"}, {"chapter": "第三章 理氣藥", "section": "", "name": "香附", "latin": "Cyperi Rhizoma"}, {"chapter": "第三章 理氣藥", "section": "", "name": "枳殼", "latin": "Citri Fructus Immaturus"}, {"chapter": "第三章 理氣藥", "section": "", "name": "枳實", "latin": "Aurantii Fructus Immaturus"}, {"chapter": "第三章 理氣藥", "section": "", "name": "沉香", "latin": "Aquilariae Lignum Resinatum"}, {"chapter": "第三章 理氣藥", "section": "", "name": "陳皮", "latin": "Citri Reticulatae Pericarpium ITRI RETICULATAE PERICARPIUM VETUM"}, {"chapter": "第四章 平肝息風藥", "section": "", "name": "鉤藤", "latin": "Uncariae Ramulus cum Uncis"}, {"chapter": "第四章 平肝息風藥", "section": "", "name": "天麻", "latin": "Gastrodiae Rhizoma GASTRODIAE TUBER"}, {"chapter": "第四章 平肝息風藥", "section": "", "name": "白殭蠶", "latin": "Bombyx Batryticatus"}, {"chapter": "第五章 安神藥", "section": "", "name": "酸棗仁", "latin": "Zizyphi Spinosae Semen"}, {"chapter": "第五章 安神藥", "section": "", "name": "柏子仁", "latin": "Platycladi Semen"}, {"chapter": "第五章 安神藥", "section": "", "name": "遠志", "latin": "Polygalae Radix"}, {"chapter": "第六章 收澀藥", "section": "", "name": "蓮子", "latin": "Nelumbinis Semen"}, {"chapter": "第六章 收澀藥", "section": "", "name": "芡實", "latin": "Euryale Semen EURYALIS SEMEN"}, {"chapter": "第六章 收澀藥", "section": "", "name": "五味子", "latin": "Schisandrae Fructus"}, {"chapter": "第六章 收澀藥", "section": "", "name": "山茱萸", "latin": "Corni Sarcocarpium"}, {"chapter": "第六章 收澀藥", "section": "", "name": "訶子", "latin": "Chebulae Fructus"}, {"chapter": "第六章 收澀藥", "section": "", "name": "覆盆子", "latin": "Rubi Fructus RUBI FRUCTUS IMMATURUS"}, {"chapter": "第七章 解表藥", "section": "第一節 辛溫解表藥", "name": "麻黃", "latin": "Ephedrae Herba"}, {"chapter": "第七章 解表藥", "section": "第一節 辛溫解表藥", "name": "辛夷", "latin": "Magnoliae Flos"}, {"chapter": "第七章 解表藥", "section": "第一節 辛溫解表藥", "name": "白芷", "latin": "Angelicae Dahuricae Radix"}, {"chapter": "第七章 解表藥", "section": "第一節 辛溫解表藥", "name": "蒼耳子", "latin": "Xanthii Fructus"}, {"chapter": "第七章 解表藥", "section": "第一節 辛溫解表藥", "name": "防風", "latin": "Saposhnikoviae Radix SAPOSHNIKOVIAE RADIX ET RHIZOMA"}, {"chapter": "第七章 解表藥", "section": "第一節 辛溫解表藥", "name": "羌活", "latin": "Notopterygii Rhizoma et Radix"}, {"chapter": "第七章 解表藥", "section": "第一節 辛溫解表藥", "name": "荊芥", "latin": "Nepetae Herba"}, {"chapter": "第七章 解表藥", "section": "第一節 辛溫解表藥", "name": "紫蘇葉", "latin": "Perillae Folium"}, {"chapter": "第七章 解表藥", "section": "第一節 辛溫解表藥", "name": "生薑", "latin": "Zingiberis Rhizoma ZINGIBERIS RHIZOMA RECENS"}, {"chapter": "第七章 解表藥", "section": "第一節 辛溫解表藥", "name": "蔥白", "latin": "Allii Fistulosi Bulbus"}, {"chapter": "第七章 解表藥", "section": "第二節 辛涼解表藥", "name": "柴胡", "latin": "Bupleuri Radix BUPLEURI RADIX ET RHIZOMA"}, {"chapter": "第七章 解表藥", "section": "第二節 辛涼解表藥", "name": "葛根", "latin": "Puerariae Radix"}, {"chapter": "第七章 解表藥", "section": "第二節 辛涼解表藥", "name": "菊花", "latin": "Chrysanthemi Flos"}, {"chapter": "第七章 解表藥", "section": "第二節 辛涼解表藥", "name": "薄荷", "latin": "Menthae Herba"}, {"chapter": "第七章 解表藥", "section": "第二節 辛涼解表藥", "name": "牛蒡子", "latin": "Arctii Fructus"}, {"chapter": "第七章 解表藥", "section": "第二節 辛涼解表藥", "name": "蔓荊子", "latin": "Viticis Fructus"}, {"chapter": "第七章 解表藥", "section": "第二節 辛涼解表藥", "name": "升麻", "latin": "Cimicifugae Rhizoma"}, {"chapter": "第七章 解表藥", "section": "第二節 辛涼解表藥", "name": "淡豆豉", "latin": "Sojae Semen Praeparatum"}, {"chapter": "第八章 化痰 止咳平喘藥", "section": "第一節 化痰藥", "name": "半夏", "latin": "Pinelliae Rhizoma"}, {"chapter": "第八章 化痰 止咳平喘藥", "section": "第一節 化痰藥", "name": "貝母", "latin": "Fritillariae Bulbus"}, {"chapter": "第八章 化痰 止咳平喘藥", "section": "第一節 化痰藥", "name": "桔梗", "latin": "Platycodonis Radix"}, {"chapter": "第八章 化痰 止咳平喘藥", "section": "第一節 化痰藥", "name": "皂莢", "latin": "Gleditsiae Fructus Gleditsiae Spina"}, {"chapter": "第八章 化痰 止咳平喘藥", "section": "第一節 化痰藥", "name": "旋覆花", "latin": "Inulae Flos PENTANEMAE ET INULAE FLOS"}, {"chapter": "第八章 化痰 止咳平喘藥", "section": "第一節 化痰藥", "name": "萊菔子", "latin": "Raphani Semen"}, {"chapter": "第八章 化痰 止咳平喘藥", "section": "第一節 化痰藥", "name": "前胡", "latin": "Peucedani Radix"}, {"chapter": "第八章 化痰 止咳平喘藥", "section": "第一節 化痰藥", "name": "竹茹", "latin": "Bambusae Caulis In Taenias"}, {"chapter": "第八章 化痰 止咳平喘藥", "section": "第一節 化痰藥", "name": "胖大海", "latin": "Sterculiae Lychnophorae Semen SCAPHII SEMEN"}, {"chapter": "第八章 化痰 止咳平喘藥", "section": "第一節 化痰藥", "name": "昆布", "latin": "Laminariae Thallus Eckloniae Thallus"}, {"chapter": "第八章 化痰 止咳平喘藥", "section": "第二節 止咳平喘藥", "name": "白果", "latin": "Ginkgo Semen"}, {"chapter": "第八章 化痰 止咳平喘藥", "section": "第二節 止咳平喘藥", "name": "苦杏仁", "latin": "ARMENIACAE SEMEN AMARUM"}, {"chapter": "第八章 化痰 止咳平喘藥", "section": "第二節 止咳平喘藥", "name": "桑白皮", "latin": "Mori Radicis Cortex"}, {"chapter": "第八章 化痰 止咳平喘藥", "section": "第二節 止咳平喘藥", "name": "枇杷葉", "latin": "Eriobotryae Folium"}, {"chapter": "第八章 化痰 止咳平喘藥", "section": "第二節 止咳平喘藥", "name": "紫苑", "latin": "Asteris Radix et Rhizoma"}, {"chapter": "第八章 化痰 止咳平喘藥", "section": "第二節 止咳平喘藥", "name": "百部", "latin": "Stemonae Radix"}, {"chapter": "第九章 利水滲濕藥", "section": "", "name": "茯苓", "latin": "Poria"}, {"chapter": "第九章 利水滲濕藥", "section": "", "name": "豬苓", "latin": "Polyporus"}, {"chapter": "第九章 利水滲濕藥", "section": "", "name": "白朮", "latin": "Atractylodis Macrocephalae Rhizoma"}, {"chapter": "第九章 利水滲濕藥", "section": "", "name": "車前子", "latin": "Plantaginis Semen"}, {"chapter": "第九章 利水滲濕藥", "section": "", "name": "木通", "latin": "Akebiae Caulis"}, {"chapter": "第九章 利水滲濕藥", "section": "", "name": "（粉）萆薢", "latin": "粉 Dioscoreae Hypoglaucae Rhizoma"}, {"chapter": "第九章 利水滲濕藥", "section": "", "name": "萹蓄", "latin": "Polygoni Avicularis Herba"}, {"chapter": "第九章 利水滲濕藥", "section": "", "name": "澤瀉", "latin": "Alismatis Rhizoma ALISMATIS TUBER"}, {"chapter": "第九章 利水滲濕藥", "section": "", "name": "燈心草", "latin": "Junci Medulla"}, {"chapter": "第九章 利水滲濕藥", "section": "", "name": "瞿麥", "latin": "Dianthi Herba"}, {"chapter": "第十章 芳香化濕藥", "section": "", "name": "蒼朮", "latin": "Atractylodis Rhizoma"}, {"chapter": "第十章 芳香化濕藥", "section": "", "name": "厚朴", "latin": "Magnoliae Cortex"}, {"chapter": "第十章 芳香化濕藥", "section": "", "name": "廣藿香", "latin": "Pogostemonis Herba"}, {"chapter": "第十章 芳香化濕藥", "section": "", "name": "砂仁", "latin": "Amomi Fructus"}, {"chapter": "第十一章 袪風濕藥", "section": "", "name": "威靈仙", "latin": "Clematidis Radix et Rhizoma"}, {"chapter": "第十一章 袪風濕藥", "section": "", "name": "桑寄生", "latin": "Taxilli Herba"}, {"chapter": "第十一章 袪風濕藥", "section": "", "name": "獨活", "latin": "Angelicae Pubescentis Radix ANGELICAE BISERRATAE RADIX"}, {"chapter": "第十一章 袪風濕藥", "section": "", "name": "秦艽", "latin": "Gentianae Macrophyllae Radix"}, {"chapter": "第十一章 袪風濕藥", "section": "", "name": "五加皮", "latin": "Acanthopanacis Radicis Cortex ELEUTHEROCOCCI RADICIS CORTEX"}, {"chapter": "第十二章 消食藥", "section": "", "name": "山楂", "latin": "Crataegi Fructus"}, {"chapter": "第十二章 消食藥", "section": "", "name": "神麴", "latin": "Massa Medicata Fermentata"}, {"chapter": "第十二章 消食藥", "section": "", "name": "麥芽", "latin": "Hordei Fructus Germinatus"}, {"chapter": "第十二章 消食藥", "section": "", "name": "穀牙", "latin": "Oryzae Fructus Germinatus"}, {"chapter": "第十三章 瀉下藥", "section": "第一節 攻下藥", "name": "大黃", "latin": "Rhei Radix et Rhizoma"}, {"chapter": "第十三章 瀉下藥", "section": "第一節 攻下藥", "name": "蘆薈", "latin": "Aloe"}, {"chapter": "第十三章 瀉下藥", "section": "第二節 潤下藥", "name": "火麻仁", "latin": "Cannabis Fructus"}, {"chapter": "第十四章 活血袪瘀藥", "section": "", "name": "丹參", "latin": "Salviae Miltiorrhizae Radix et Rhizoma"}, {"chapter": "第十四章 活血袪瘀藥", "section": "", "name": "桃仁", "latin": "Persicae Semen"}, {"chapter": "第十四章 活血袪瘀藥", "section": "", "name": "紅花", "latin": "Carthami Flos"}, {"chapter": "第十四章 活血袪瘀藥", "section": "", "name": "延胡索", "latin": "Corydalis Rhizoma CORYDALIS TUBER"}, {"chapter": "第十四章 活血袪瘀藥", "section": "", "name": "蘇木", "latin": "Sappan Lignum"}, {"chapter": "第十四章 活血袪瘀藥", "section": "", "name": "川芎", "latin": "Chuanxiong Rhizoma"}, {"chapter": "第十四章 活血袪瘀藥", "section": "", "name": "薑黃", "latin": "Curcumae Longae Rhizoma"}, {"chapter": "第十四章 活血袪瘀藥", "section": "", "name": "益母草", "latin": "Leonuri Herba"}, {"chapter": "第十四章 活血袪瘀藥", "section": "", "name": "牛膝", "latin": "Achyranthis Bidentatae Radix"}, {"chapter": "第十四章 活血袪瘀藥", "section": "", "name": "乳香", "latin": "Olibanum"}, {"chapter": "第十四章 活血袪瘀藥", "section": "", "name": "血竭", "latin": "Draconis Sanguis"}, {"chapter": "第十四章 活血袪瘀藥", "section": "", "name": "水蛭", "latin": "Hirudo"}, {"chapter": "第十五章 止血藥", "section": "", "name": "白及", "latin": "Bletillae Rhizoma BLETILLAE TUBER"}, {"chapter": "第十五章 止血藥", "section": "", "name": "艾葉", "latin": "Artemisiae Argyi Folium"}, {"chapter": "第十五章 止血藥", "section": "", "name": "槐花", "latin": "Sophorae Flos et Flos Immaturus"}, {"chapter": "第十五章 止血藥", "section": "", "name": "側柏葉", "latin": "Platycladi Cacumen"}, {"chapter": "第十五章 止血藥", "section": "", "name": "三七", "latin": "Notoginseng Radix et Rhizoma"}, {"chapter": "第十六章 清熱藥", "section": "第一節 清熱解毒藥", "name": "金銀花", "latin": "Lonicerae Japonicae Flos"}, {"chapter": "第十六章 清熱藥", "section": "第一節 清熱解毒藥", "name": "連翹", "latin": "Forsythiae Fructus"}, {"chapter": "第十六章 清熱藥", "section": "第一節 清熱解毒藥", "name": "蒲公英", "latin": "Taraxaci Herba"}, {"chapter": "第十六章 清熱藥", "section": "第一節 清熱解毒藥", "name": "北板藍根", "latin": "Isatidis Radix"}, {"chapter": "第十六章 清熱藥", "section": "第一節 清熱解毒藥", "name": "山豆根", "latin": "Sophorae Tonkinensis Radix"}, {"chapter": "第十六章 清熱藥", "section": "第一節 清熱解毒藥", "name": "敗醬草", "latin": "Patriniae Herba"}, {"chapter": "第十六章 清熱藥", "section": "第一節 清熱解毒藥", "name": "射干", "latin": "Blelamcandae Rhizoma IRIDIS DOMESTICAE RHIZOMA"}, {"chapter": "第十六章 清熱藥", "section": "第二節 清熱瀉火藥", "name": "梔子", "latin": "Gardeniae Fructus"}, {"chapter": "第十六章 清熱藥", "section": "第二節 清熱瀉火藥", "name": "夏枯草", "latin": "Prunellae Spica"}, {"chapter": "第十六章 清熱藥", "section": "第二節 清熱瀉火藥", "name": "栝樓根", "latin": "Trichosanthis Radix"}, {"chapter": "第十六章 清熱藥", "section": "第二節 清熱瀉火藥", "name": "蘆根", "latin": "Phragmitis Rhizoma"}, {"chapter": "第十六章 清熱藥", "section": "第二節 清熱瀉火藥", "name": "淡竹葉", "latin": "Lophatheri Herba"}, {"chapter": "第十六章 清熱藥", "section": "第三節 清熱燥濕藥", "name": "黃連", "latin": "Coptidis Rhizoma"}, {"chapter": "第十六章 清熱藥", "section": "第三節 清熱燥濕藥", "name": "黃芩", "latin": "Scutellariae Radix"}, {"chapter": "第十六章 清熱藥", "section": "第三節 清熱燥濕藥", "name": "黃柏", "latin": "黃蘗 Phellodendri Cortex"}, {"chapter": "第十六章 清熱藥", "section": "第三節 清熱燥濕藥", "name": "龍膽", "latin": "Gentianae Radix et Rhizoma"}, {"chapter": "第十六章 清熱藥", "section": "第三節 清熱燥濕藥", "name": "苦參", "latin": "Sophorae Flavescentis Radix"}, {"chapter": "第十六章 清熱藥", "section": "第四節 清熱涼血藥", "name": "玄參", "latin": "Scrophulariae Radix"}, {"chapter": "第十六章 清熱藥", "section": "第四節 清熱涼血藥", "name": "牡丹皮", "latin": "Moutan Radicis Cortex"}, {"chapter": "第十六章 清熱藥", "section": "第四節 清熱涼血藥", "name": "紫草", "latin": "Lithospermi Radix Arnebiae Radix"}, {"chapter": "第十六章 清熱藥", "section": "第四節 清熱涼血藥", "name": "赤芍", "latin": "Paeoniae Rubra Radix"}, {"chapter": "第十六章 清熱藥", "section": "第五節 清虛熱藥", "name": "地骨皮", "latin": "Lycii Radicis Cortex"}, {"chapter": "第十六章 清熱藥", "section": "第五節 清虛熱藥", "name": "青蒿", "latin": "Artemisiae Annuae Herba"}, {"chapter": "第十七章 外用藥", "section": "", "name": "蛇床子", "latin": "Cnidii Fructus"}, {"chapter": "第十八章 驅蟲藥", "section": "", "name": "檳榔", "latin": "Arecae Semen"}];
+const $=id=>document.getElementById(id);
+const catOf=c=>c.chapter+(c.section?"｜"+c.section:"");
+function shuffle(a){let x=[...a];for(let i=x.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[x[i],x[j]]=[x[j],x[i]];}return x;}
+const chapters=[...new Set(allCards.map(c=>c.chapter))];
+["cardChapter","chapter"].forEach(id=>chapters.forEach(ch=>{const o=document.createElement("option");o.value=ch;o.textContent=ch;$(id).appendChild(o);}));
+$("totalTag").textContent=allCards.length+" 個中藥項目";
+
+/* ---------- Tabs ---------- */
+function showTab(name){
+ const cards=name==="cards";
+ $("tab-cards").setAttribute("aria-selected",cards);$("tab-quiz").setAttribute("aria-selected",!cards);
+ $("view-cards").hidden=!cards;$("view-quiz").hidden=cards;
+ if(location.hash!=="#"+name)history.replaceState(null,"","#"+name);
+}
+$("tab-cards").addEventListener("click",()=>showTab("cards"));
+$("tab-quiz").addEventListener("click",()=>showTab("quiz"));
+window.addEventListener("hashchange",()=>showTab(location.hash==="#quiz"?"quiz":"cards"));
+
+/* ---------- 字卡 ---------- */
+let filtered=[...allCards], idx=0, flipped=false, reverse=false, wrongSet=null;
+const seen=new Set();
+function showCard(){
+ if(!filtered.length){
+  $("frontText").textContent="找不到符合的字卡";$("frontText").className="term";$("backText").textContent="請調整搜尋條件";
+  $("frontCategory").textContent="";$("backCategory").textContent="";$("counter").textContent="0 張";
+  $("prev").disabled=$("nextCard").disabled=true;$("quizThese").disabled=true;return;
+ }
+ $("quizThese").disabled=false;
+ idx=Math.max(0,Math.min(idx,filtered.length-1));
+ const c=filtered[idx];seen.add(c.name);
+ $("frontText").textContent=reverse?c.latin:c.name;$("frontText").className=reverse?"term latin":"term";
+ $("backText").textContent=reverse?c.name:c.latin;$("backText").className=reverse?"term":"latin";
+ $("frontKicker").textContent=reverse?"拉丁學名":"中藥名稱";$("backKicker").textContent=reverse?"中藥名稱":"拉丁學名";
+ $("frontCategory").textContent=$("backCategory").textContent=catOf(c);
+ $("counter").textContent=`第 ${idx+1} / ${filtered.length} 張`;
+ const pct=Math.round(seen.size/allCards.length*100);
+ $("seenText").textContent=`${pct}% 已瀏覽`;$("cardBar").style.width=pct+"%";
+ $("flashcard").classList.toggle("flipped",flipped);
+ $("prev").disabled=idx===0;$("nextCard").disabled=idx===filtered.length-1;
+}
+function flip(){if(!filtered.length)return;flipped=!flipped;showCard();}
+function move(n){if(!filtered.length)return;idx=Math.max(0,Math.min(filtered.length-1,idx+n));flipped=false;showCard();}
+function filterCards(){
+ const q=$("search").value.trim().toLowerCase(), ch=$("cardChapter").value;
+ const base=wrongSet?allCards.filter(c=>wrongSet.has(c.name)):allCards;
+ filtered=base.filter(c=>(!ch||c.chapter===ch)&&(!q||(c.name+c.latin+c.chapter+c.section).toLowerCase().includes(q)));
+ idx=0;flipped=false;showCard();
+}
+function setWrongSet(names){
+ wrongSet=names?new Set(names):null;
+ $("wrongNotice").hidden=!wrongSet;
+ if(wrongSet)$("wrongNoticeText").textContent=`正在複習上次答錯的 ${wrongSet.size} 張字卡`;
+ $("search").value="";$("cardChapter").value="";filterCards();
+}
+let sx=null,sy=null,swiped=false;
+$("flashcard").addEventListener("touchstart",e=>{const p=e.touches[0];sx=p.clientX;sy=p.clientY;swiped=false;},{passive:true});
+$("flashcard").addEventListener("touchend",e=>{
+ if(sx===null)return;const p=e.changedTouches[0],dx=p.clientX-sx,dy=p.clientY-sy;sx=null;
+ if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.5){
+  swiped=true;const n=dx<0?1:-1,before=idx;move(n);
+  const fc=$("flashcard");fc.classList.remove("swipe-l","swipe-r");void fc.offsetWidth;
+  if(idx===before)fc.classList.add(n>0?"swipe-l":"swipe-r");
+ }
+},{passive:true});
+$("flashcard").addEventListener("click",()=>{if(swiped){swiped=false;return;}flip();});$("flip").addEventListener("click",flip);
+$("prev").addEventListener("click",()=>move(-1));$("nextCard").addEventListener("click",()=>move(1));
+$("search").addEventListener("input",filterCards);$("cardChapter").addEventListener("change",filterCards);
+$("shuffle").addEventListener("click",()=>{filtered=shuffle(filtered);idx=0;flipped=false;showCard();});
+$("reverse").addEventListener("click",()=>{reverse=!reverse;flipped=false;showCard();});
+$("resetCards").addEventListener("click",()=>{reverse=false;seen.clear();setWrongSet(null);});
+$("clearWrong").addEventListener("click",()=>setWrongSet(null));
+$("quizThese").addEventListener("click",()=>{if(filtered.length){showTab("quiz");startQuiz(filtered,"all");}});
+document.addEventListener("keydown",e=>{
+ if($("view-cards").hidden)return;
+ const t=e.target.tagName;if(t==="INPUT"||t==="SELECT"||(t==="BUTTON"&&e.key!=="ArrowLeft"&&e.key!=="ArrowRight"))return;
+ if(e.key==="ArrowLeft")move(-1);else if(e.key==="ArrowRight")move(1);
+ else if(e.key===" "||e.key==="Enter"){e.preventDefault();flip();}
+});
+
+/* ---------- 四選一 ---------- */
+let questions=[], current=0, correct=0, wrongList=[], answered=false;
+function buildQuestions(base,mode,count,order){
+ let pool=order==="sequence"?[...base]:shuffle(base);
+ if(count!=="all")pool=pool.slice(0,Math.min(Number(count),pool.length));
+ return pool.map(card=>{
+  const direction=mode==="mix"?(Math.random()<.5?"cn":"latin"):mode;
+  const key=direction==="cn"?"latin":"name";
+  const answer=card[key];
+  const others=shuffle(allCards.filter(c=>c.name!==card.name).map(c=>c[key]).filter(x=>x!==answer));
+  return {card,direction,answer,opts:shuffle([answer,...others.slice(0,3)])};
+ });
+}
+function showQuizPart(part){["setup","quiz","result"].forEach(p=>$(p).hidden=p!==part);}
+function startQuiz(base,countOverride){
+ if(!base.length){$("setupSub").textContent="目前沒有可練習的題目，請換一個範圍。";return;}
+ const order=countOverride?"random":$("order").value;
+ questions=buildQuestions(base,$("mode").value,countOverride||$("count").value,order);
+ current=0;correct=0;wrongList=[];showQuizPart("quiz");renderQ();
+}
+function renderQ(){
+ const q=questions[current];answered=false;
+ $("progress").textContent=`第 ${current+1} / ${questions.length} 題`;
+ $("liveScore").textContent=`答對 ${correct} 題`;
+ $("quizBar").style.width=(current/questions.length*100)+"%";
+ $("qtype").textContent=q.direction==="cn"?"請根據中藥名稱選出正確的拉丁學名":"請根據拉丁學名選出正確的中藥名稱";
+ const qe=$("question");qe.innerHTML="";
+ const main=document.createElement("div");main.textContent=q.direction==="cn"?q.card.name:q.card.latin;if(q.direction==="latin")main.className="latin";
+ const small=document.createElement("small");small.textContent=q.direction==="cn"?"這味中藥的拉丁學名是？":"這個拉丁學名對應哪一味中藥？";
+ qe.append(main,small);
+ const oe=$("options");oe.innerHTML="";
+ q.opts.forEach((opt,i)=>{
+  const b=document.createElement("button");b.className="option";b.dataset.value=opt;
+  const l=document.createElement("span");l.className="letter";l.textContent="ABCD"[i];
+  const t=document.createElement("span");t.textContent=opt;if(q.direction==="cn")t.style.fontFamily="var(--latin)";
+  b.append(l,t);b.addEventListener("click",()=>choose(opt,b));oe.appendChild(b);
+ });
+ $("feedback").hidden=true;$("confirmQuit").hidden=true;
+ $("next").disabled=true;$("next").textContent=current===questions.length-1?"查看結果":"下一題 →";
+}
+function choose(value,button){
+ if(answered)return;answered=true;
+ const q=questions[current],ok=value===q.answer;
+ if(ok)correct++;else wrongList.push({card:q.card,direction:q.direction,chosen:value,answer:q.answer});
+ [...$("options").children].forEach(b=>{b.disabled=true;if(b.dataset.value===q.answer)b.classList.add("correct");else if(b===button)b.classList.add("wrong");});
+ const f=$("feedback");f.hidden=false;f.className="feedback "+(ok?"good":"bad");
+ f.textContent=ok?"答對了！":`答錯了，正確答案是：${q.answer}`;
+ const pair=document.createElement("div");pair.className="meta";pair.textContent=`${q.card.name} ＝ ${q.card.latin}｜${catOf(q.card)}`;f.appendChild(pair);
+ $("next").disabled=false;$("liveScore").textContent=`答對 ${correct} 題`;
+ $("quizBar").style.width=((current+1)/questions.length*100)+"%";
+ if(matchMedia("(hover:hover)").matches)$("next").focus({preventScroll:true});else $("next").scrollIntoView({block:"nearest",behavior:"smooth"});
+}
+function finish(){
+ showQuizPart("result");
+ const total=questions.length, rate=Math.round(correct/total*100);
+ $("finalScore").textContent=correct;$("finalRate").textContent=rate+"%";$("finalWrong").textContent=total-correct;
+ $("resultMessage").textContent=rate===100?"太棒了！全部答對！":rate>=80?"表現很好，繼續保持！":rate>=60?"已經有不錯的基礎，再複習錯題會更熟悉。":"可以先用字卡複習錯題，再重新挑戰一次。";
+ $("wrongOnly").disabled=$("wrongCards").disabled=!wrongList.length;
+ const r=$("review");r.innerHTML="";
+ if(!wrongList.length){r.textContent="本次沒有答錯的題目！";return;}
+ wrongList.forEach((w,i)=>{
+  const d=document.createElement("div");d.className="reviewitem";
+  const q=document.createElement("div");q.textContent=`${i+1}. ${w.direction==="cn"?w.card.name:w.card.latin}`;
+  const y=document.createElement("div");y.textContent="你的答案："+w.chosen;
+  const a=document.createElement("b");a.textContent="正確答案："+w.answer;
+  const c=document.createElement("div");c.className="meta";c.textContent=catOf(w.card);
+  d.append(q,y,a,c);r.appendChild(d);
+ });
+}
+$("start").addEventListener("click",()=>{const ch=$("chapter").value;startQuiz(allCards.filter(c=>!ch||c.chapter===ch));});
+$("next").addEventListener("click",()=>{if(!answered)return;if(current<questions.length-1){current++;renderQ();}else finish();});
+$("quit").addEventListener("click",()=>{$("confirmQuit").hidden=false;});
+$("quitNo").addEventListener("click",()=>{$("confirmQuit").hidden=true;});
+$("quitYes").addEventListener("click",()=>showQuizPart("setup"));
+$("retry").addEventListener("click",()=>showQuizPart("setup"));
+$("wrongOnly").addEventListener("click",()=>startQuiz(wrongList.map(w=>w.card),"all"));
+$("wrongCards").addEventListener("click",()=>{setWrongSet(wrongList.map(w=>w.card.name));showTab("cards");});
+document.addEventListener("keydown",e=>{
+ if($("view-quiz").hidden||$("quiz").hidden)return;
+ const k=e.key.toUpperCase(), i="ABCD".indexOf(k)>=0?"ABCD".indexOf(k):"1234".indexOf(e.key);
+ if(i>=0&&!answered){const b=$("options").children[i];if(b)b.click();}
+});
+
+showCard();
+showTab(location.hash==="#quiz"?"quiz":"cards");
+</script>
+</body>
+</html>
